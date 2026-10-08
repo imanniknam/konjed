@@ -1,0 +1,30 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env: { POSTGRES_USER: konjed, POSTGRES_HOST_AUTH_METHOD: trust, POSTGRES_DB: konjed }
+        ports: ["54329:5432"]
+        options: >-
+          --health-cmd "pg_isready -U konjed" --health-interval 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://konjed@127.0.0.1:54329/konjed
+      SITE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run db:migrate
+      - run: npm run db:seed:demo
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: start server
+        run: npx next start -p 3000 & npx wait-on http://localhost:3000/api/health
+      - run: npm run test:api
+      - run: npm run test:pages
+      - run: npx playwright test

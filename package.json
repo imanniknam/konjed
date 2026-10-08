@@ -1,0 +1,46 @@
+{
+  "name": "konjed",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start",
+    "db:start": "scripts/db.sh start",
+    "db:stop": "scripts/db.sh stop",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx --env-file-if-exists=.env.local scripts/migrate.ts",
+    "db:seed": "tsx --env-file-if-exists=.env.local scripts/seed.ts",
+    "db:seed:demo": "tsx --env-file-if-exists=.env.local scripts/seed.ts --demo",
+    "typecheck": "tsc --noEmit",
+    "test:api": "tsx --env-file-if-exists=.env.local scripts/api-smoke.ts",
+    "test:pages": "tsx --env-file-if-exists=.env.local scripts/pages-smoke.ts",
+    "build:scripts": "esbuild scripts/migrate.ts scripts/seed.ts --bundle --platform=node --format=esm --packages=external --outdir=dist --out-extension:.js=.mjs",
+    "test:e2e": "playwright test",
+    "test:all": "npm run typecheck && npm run test:api && npm run test:pages && npm run test:e2e",
+    "start:prod": "node dist/migrate.mjs && node dist/seed.mjs && node .next/standalone/server.js"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.3",
+    "gsap": "^3.12.5",
+    "lenis": "^1.1.13",
+    "next": "^15.0.0",
+    "pg": "^8.23.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "drizzle-kit": "^0.31.11",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.23.15",
+    "typescript": "^5.6.0",
+    "wait-on": "^9.5.1"
+  }
+}
